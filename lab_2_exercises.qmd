@@ -1,5 +1,178 @@
 ---
 title: "lab_2_exercises"
 format: html
+editor: visual
 ---
+
+```{r}
+install.packages("dplyr")
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+#1
+glimpse(tree_dat)
+```
+```{r}
+#2
+tree_dat %>% 
+  filter(standID == 1) %>% 
+  tally()
+```
+
+```{r}
+tree_count1 <- tree_dat %>% 
+  filter(standID == 1)
+
+
+print(tree_count1)
+```
+```{r}
+#3
+tree_dat %>% 
+  filter(species %in% c("ABBA", "PIST")) %>% 
+  count(species)
+#ABBA count is 13033
+#PST count is 4188
+```
+```{r}
+#4
+last_year <- max(tree_dat$year, na.rm = TRUE)
+
+tree_dat %>% 
+  filter(year == last_year, age > 200) %>% 
+  tally()
+#Last year is 2007
+#7 trees older than 200
+```
+```{r}
+#5
+tree_dat %>% 
+  slice_max(order_by = age, n = 1)
+
+oldest_tree <- tree_dat %>% 
+  slice_max(order_by = age, n = 1)
+
+
+```
+```{r}
+#6
+oldest_2001 <- tree_dat %>% 
+  filter(year == 2001) %>% 
+  slice_max(order_by = age, n = 5)
+print(oldest_2001)
+```
+```{r}
+#7
+tree_dat %>% 
+  filter(year == 2002) %>% 
+  slice_sample(prop = .3)
+```
+```{r}
+#8
+tree_dat %>% 
+  filter(year == 2007, standID == 5) %>% 
+  arrange(desc(rad_ib)) %>%
+  slice_head(n = 3)
+#Three tree IDs are: 128, 157, 135
+```
+```{r}
+#9
+smallest_2007 <- tree_dat %>% 
+  select(treeID, standID, year, rad_ib) %>% 
+  filter(year == 2007) %>% 
+  slice_min(order_by = rad_ib, n = 3)
+print(smallest_2007)
+```
+```{r}
+#10
+treedata_withoutStand <- tree_dat %>% 
+  select(!standID) 
+  glimpse(treedata_withoutStand)
+
+
+```
+```{r}
+#11
+columnsWithID <- tree_dat %>%
+  dplyr::select(contains("ID"))
+glimpse(columnsWithID)
+  
+```
+```{r}
+#12
+columnsWithIDandStand <- tree_dat %>%
+  dplyr::select(contains(c("ID", "stand")))
+glimpse(columnsWithIDandStand)
+```
+```{r}
+#13
+tree_dat <- tree_dat %>% 
+  rename("inc_mm" = "inc")
+glimpse(tree_dat)
+```
+```{r}
+tree_dat <- tree_dat %>% 
+  rename("rad_mm" = "rad_ib")
+glimpse(tree_dat)
+```
+```{r}
+#14
+bac <- tree_dat %>% 
+  mutate(DBH = (rad_mm) /10) %>% 
+  mutate(ba_in_cm = 0.00007854* (DBH)^2) %>% 
+  mutate(BA_m2 = ((ba_in_cm) /100)^2) %>% 
+  filter(year == 2007, species == "POTR") 
+mean(bac$BA_m2)
+```
+```{r}
+#15
+library(dplyr)
+if_established <- tree_dat %>%
+  mutate(Established = if_else(age > 5, TRUE, FALSE))
+num_established <- sum(if_established$Established)
+print(num_established)
+```
+```{r}
+#16
+DBH_class <- tree_dat %>% 
+  mutate(DBH_cm = ((rad_mm) /10)*2,
+          class = case_when(
+           DBH_cm >= 0 & DBH_cm < 2.5 ~ "seedling",
+           DBH_cm >= 2.5 & DBH_cm < 10 ~ "sapling",
+           DBH_cm >= 10 & DBH_cm < 30 ~ "pole",
+           DBH_cm >= 30 ~ "sawlog"
+         )) %>% 
+  filter(year == 2007) %>% 
+  count(class)
+print(DBH_class)
+```
+
+```{r}
+#17
+DBH_table <- tree_dat %>% 
+  mutate(DBH_cm = ((rad_mm) /10)*2) %>% 
+  filter(year == 2007) %>% 
+   summarize(
+    mean_DBH = mean(DBH_cm, na.rm = TRUE),  # Compute mean, ignore NAs
+    sd_DBH = sd(DBH_cm, na.rm = TRUE)  # Compute standard deviation
+  )
+print(DBH_table)
+
+#The mean of the radius tells us the average diameter at breast height of the trees while the standard deviation tells us how much these values can vary by. 
+```
+
+```{r}
+#18
+
+```
+
+
+
+
+
+
 
